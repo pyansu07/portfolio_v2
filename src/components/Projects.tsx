@@ -90,7 +90,8 @@ const Projects = () => {
       {
         title: 'Portfolio 2.0',
         description: 'Personal portfolio website',
-        github: 'https://github.com/yourusername/portfolio',
+        github: 'https://github.com/pyansu07/portfolio_v2',
+        demo: 'https://pyansu-nahak.vercel.app/',
         tags: ['REACT', 'TAILWIND']
       }
     ],
