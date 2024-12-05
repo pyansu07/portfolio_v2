@@ -51,6 +51,7 @@ const Projects = () => {
       description: 'A modern clothing store web application that offers a seamless shopping experience. It features advanced product filtering, integrated customer support via a chatbot.',
       image: i3,
       github: 'https://github.com/pyansu07/AttireAura',
+      demo: 'https://youtu.be/q4bPM9MyXxY?si=G0MhKo59xjXMzF8A',
       tags: ['MERN', 'Stripe', 'RESTful APIs']
     },
     {
@@ -58,7 +59,7 @@ const Projects = () => {
       description: 'An SIH project aimed at enhancing the images of the PSR on the Moon, by utilizing advanced image processing techniques',
       image: i4,
       github: 'https://github.com/pyansu07/Nirvana',
-      demo: 'https://youtu.be/ef7uSElfpqg?si=IQj01LfCzdmq0LpH',
+      demo: 'https://youtu.be/hPVVYts2RAc?si=AwC-T2P_qQL9beHM',
       tags: ['REACT', 'FLASK', 'PYTHON']
     },
     {
