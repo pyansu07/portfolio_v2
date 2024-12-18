@@ -45,7 +45,7 @@ const Contact = () => {
             </svg>
           </motion.a>
           <motion.a
-            href="https://x.com/pyansu_nahak"
+            href="https://x.com/algo_rizz"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-400 hover:text-white transition-colors"
