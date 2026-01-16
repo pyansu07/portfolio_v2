@@ -1,108 +1,43 @@
-import React from 'react';
-import { Github, Linkedin, Twitter } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Github, Linkedin, Mail, FileText } from 'lucide-react';
 
 const Hero = () => {
-  const text = "Hi, I'm Pyansu Nahak";
-  
   return (
-    <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px)] bg-[size:40px] bg-[linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:40px]" />
-      </div>
-      
-      {/* Content */}
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+    <section id="home" className="min-h-screen flex flex-col justify-center pt-16">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <span className="text-cyan-400 font-mono text-lg mb-4 block">Hi, I am</span>
+        <h1 className="text-5xl md:text-7xl font-bold text-slate-100 mb-6">
+          Pyansu Nahak.
+        </h1>
+        <h2 className="text-4xl md:text-6xl font-bold text-slate-400 mb-8">
+          I build scalable backends & <br />
+          <span className="text-cyan-400">intelligent ML pipelines.</span>
+        </h2>
+        
+        <p className="max-w-xl text-lg text-slate-400 mb-10 leading-relaxed">
+          Software Engineer specializing in high-performance systems. 
+          Currently architecting data engines at <span className="text-slate-100 font-semibold">Axory AI</span> and 
+          ranking in the <span className="text-slate-100 font-semibold">top 10% on LeetCode</span>.
+        </p>
+
+        <div className="flex gap-6 items-center">
+          <a 
+            href="#projects" 
+            className="px-8 py-3 border border-cyan-400 text-cyan-400 rounded hover:bg-cyan-400/10 transition-colors font-mono"
           >
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400 mb-6">
-              {text.split('').map((char, index) => (
-                <motion.span
-                  key={index}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.2, delay: index * 0.1 }}
-                  className="inline-block"
-                >
-                  {char === ' ' ? '\u00A0' : char}
-                </motion.span>
-              ))}
-            </h1>
-          </motion.div>
-          
-          <motion.p 
-            className="text-2xl md:text-3xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
-            Full Stack Developer specializing in building exceptional digital experiences
-          </motion.p>
-          
-          <motion.div 
-            className="flex justify-center space-x-6 mt-12"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            <a
-              href="https://github.com/pyansu07"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-3 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors backdrop-blur-sm"
-            >
-              <Github className="w-7 h-7 text-white" />
-            </a>
-            <a
-              href="https://www.linkedin.com/in/pyansu-nahak/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors backdrop-blur-sm"
-            >
-              <Linkedin className="w-6 h-6 text-white" />
-            </a>
-            <a
-              href="https://x.com/pyansu_nahak"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/50 transition-colors backdrop-blur-sm"
-            >
-              <Twitter className="w-6 h-6 text-white" />
-            </a>
-          </motion.div>
-          
-          <motion.div 
-            className="flex justify-center space-x-6 mt-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            <button
-              className="group relative px-8 py-4 text-lg text-white rounded-lg transition-all duration-300 ease-out hover:scale-105 font-medium overflow-hidden"
-              onClick={() => {}}
-            >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500"></span>
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              <span className="relative">Resume</span>
-            </button>
-            <button
-              className="group relative px-8 py-4 text-lg text-white rounded-lg transition-all duration-300 ease-out hover:scale-105 font-medium overflow-hidden backdrop-blur-sm"
-              onClick={() => {
-                document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-800/50 via-gray-700/50 to-gray-600/50"></span>
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-gray-700/50 via-gray-600/50 to-gray-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              <span className="relative">Contact Me</span>
-            </button>
-          </motion.div>
+            Check my work
+          </a>
+          <div className="flex gap-4">
+            <a href="https://github.com/pyansu07" target="_blank" rel="noopener noreferrer" className="p-2 hover:text-cyan-400 transition-colors"><Github size={24} /></a>
+            <a href="https://linkedin.com/in/pyansu-nahak" target="_blank" rel="noopener noreferrer" className="p-2 hover:text-cyan-400 transition-colors"><Linkedin size={24} /></a>
+            <a href="mailto:pyansu.07@gmail.com" className="p-2 hover:text-cyan-400 transition-colors"><Mail size={24} /></a>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };

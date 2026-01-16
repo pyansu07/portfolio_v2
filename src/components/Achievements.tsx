@@ -1,110 +1,84 @@
-import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Award, Medal, LucideIcon } from 'lucide-react';
+import { Trophy, Award, Users, Star } from 'lucide-react';
 
-interface AchievementCardProps {
-  title: string;
-  items: string[];
-  icon: LucideIcon;
-  delay?: number;
-  className?: string;
-}
+const technical = [
+  {
+    title: "Amazon ML Challenge 2024",
+    desc: "Rank 165 out of 18,720+ teams globally",
+    icon: Trophy,
+    color: "text-yellow-400"
+  },
+  {
+    title: "Smart India Hackathon (Internal)",
+    desc: "Winner - Selected for the national round",
+    icon: Award,
+    color: "text-purple-400"
+  },
+  {
+    title: "LeetCode & Codeforces",
+    desc: "Top 10% (Rating 1745) | Global Rank 2,179 (CF)",
+    icon: Star,
+    color: "text-orange-400"
+  }
+];
 
-const AchievementCard: React.FC<AchievementCardProps> = ({ 
-  title, 
-  items, 
-  icon: Icon, 
-  delay = 0, 
-  className = "" 
-}) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    whileHover={{ scale: 1.01 }}
-    transition={{ 
-      duration: 0.3, 
-      delay,
-      scale: { 
-        type: "spring",
-        stiffness: 300,
-        damping: 15
-      }
-    }}
-    className={`p-6 rounded-lg shadow-xl group ${className}`}
-  >
-    <div className="flex items-center gap-4 mb-6">
-      <Icon className="w-8 h-8 text-blue-300" />
-      <h3 className="text-2xl font-semibold text-gray-100">{title}</h3>
-    </div>
-    <ul className="space-y-4">
-      {items.map((item: string, index: number) => (
-        <motion.li
-          key={index}
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: delay + index * 0.1 }}
-          className="flex items-start gap-3 group-hover:no-underline"
-        >
-          <span className="text-blue-300 mt-1">•</span>
-          <span className="text-gray-200">{item}</span>
-        </motion.li>
-      ))}
-    </ul>
-  </motion.div>
-);
+const leadership = [
+  {
+    role: "Core Team Member",
+    org: "Coding Club, IIIT Nagpur",
+    desc: "Organized coding events and workshops for 500+ students."
+  },
+  {
+    role: "Design Team Core",
+    org: "Tantrafiesta 2024",
+    desc: "Led visual branding for the annual national tech fest."
+  }
+];
 
 const Achievements = () => {
-  const achievements = [
-    {
-      title: "Competitive Programming",
-      icon: Trophy,
-      items: [
-        "Rated in the top 10% on LeetCode",
-        "3-star rating at CodeChef",
-        "Achieved a rating of 1383 on Codeforces",
-        "Global Rank 521 in CodeChef Starters 108 (Div-3) and Rank 845 in CodeChef Starters 115 (Div-2)",
-        "Solved 400+ questions on LeetCode and Codeforces"
-      ]
-    },
-    {
-      title: "Hackathons",
-      icon: Award,
-      items: [
-        "Secured 165th rank out of 18,720+ teams in Amazon ML Challenge 2024",
-        "Finalist in the Imagen AI Hackathon organized by IIT Delhi",
-        "Winner in Internal Hackathon for Smart India Hackathon"
-      ]
-    },
-    {
-      title: "Other Achievements",
-      icon: Medal,
-      items: [
-        "Core Team Member, Coding Club of IIIT-Nagpur – Contributed to organizing coding events",
-        "Core Team Member, Design Team, Tantrafiesta 2024 – Contributed to event branding and visual design"
-      ]
-    }
-  ];
-
   return (
-    <section id="achievements" className="py-16 bg-gray-800">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <motion.h2 
-          className="text-3xl md:text-4xl font-bold text-center mb-12 text-white"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Achievements
-        </motion.h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {achievements.map((achievement, index) => (
-            <AchievementCard
-              key={achievement.title}
-              {...achievement}
-              delay={index * 0.2}
-              className="relative bg-gray-800/90 hover:bg-gray-800 transition-colors duration-300 hover:shadow-lg hover:shadow-blue-400/20 cursor-pointer"
-            />
-          ))}
+    <section id="achievements" className="py-24">
+      <div className="flex items-center gap-4 mb-12">
+        <h2 className="text-3xl font-bold text-slate-100"> <span className="text-cyan-400">04.</span> Achievements</h2>
+        <div className="h-px bg-slate-800 flex-grow"></div>
+      </div>
+
+      <div className="grid md:grid-cols-[1.5fr_1fr] gap-8">
+        
+        {/* Technical Wins */}
+        <div className="space-y-4">
+            <h3 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
+                <Trophy className="text-cyan-400" size={20}/> Competitions
+            </h3>
+            {technical.map((item, idx) => (
+                <motion.div 
+                    key={idx}
+                    whileHover={{ x: 5 }}
+                    className="bg-slate-900/50 p-6 rounded border border-slate-800 flex items-start gap-4"
+                >
+                    <div className={`p-2 bg-slate-800 rounded-full ${item.color}`}>
+                        <item.icon size={20} />
+                    </div>
+                    <div>
+                        <h4 className="text-slate-100 font-bold text-lg">{item.title}</h4>
+                        <p className="text-slate-400 text-sm">{item.desc}</p>
+                    </div>
+                </motion.div>
+            ))}
+        </div>
+
+        {/* Leadership */}
+        <div className="space-y-4">
+             <h3 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
+                <Users className="text-cyan-400" size={20}/> Leadership
+            </h3>
+            {leadership.map((item, idx) => (
+                <div key={idx} className="bg-slate-900/30 p-6 rounded border border-slate-800/50">
+                    <h4 className="text-cyan-400 font-bold">{item.role}</h4>
+                    <p className="text-slate-100 text-sm mb-2">{item.org}</p>
+                    <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+            ))}
         </div>
       </div>
     </section>

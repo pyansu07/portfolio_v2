@@ -1,364 +1,133 @@
-import React, { useState } from 'react';
-import { ExternalLink, Github } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import i1 from '../icons/tc.png';
-import i2 from '../icons/kora.png';
-import i3 from '../icons/aa.png';
-import i4 from '../icons/nir.png';
-import i5 from '../icons/proxy-server-1.jpeg';
-import i6 from '../icons/x.png';
-type ProjectCategory = 'frontend' | 'backend' | 'fullstack' | 'ml';
+import { motion } from 'framer-motion';
+import { Github, ExternalLink, Folder, Terminal, Cpu, Youtube, BarChart3, ScanEye } from 'lucide-react';
 
-interface BaseProject {
-  title: string;
-  description: string;
-  github: string;
-  tags: string[];
-}
+const projects = [
+  {
+    title: "JobX",
+    description: "Microservices backend. Implemented an asynchronous event streaming pipeline using Apache Kafka to decouple services and ensure data consistency.",
+    tech: ["Node.js", "Kafka", "PostgreSQL", "Docker"],
+    github: "https://github.com/pyansu07/Job-X",
+    live: null,
+    icon: Cpu,
+    type: "Backend Architecture"
+  },
+  {
+    title: "TypeChamp",
+    description: "Real-time multiplayer typing platform. Engineered bidirectional WebSocket pipelines (Socket.io) for low-latency keystroke synchronization between clients.",
+    tech: ["React", "Socket.io", "Node.js", "Redis"],
+    github: "https://github.com/pyansu07/TypeChamp_v2",
+    live: "https://tc-d-frontend.onrender.com/",
+    icon: Folder,
+    type: "Full Stack"
+  },
+  {
+    title: "Code Cortex",
+    description: "Amazon ML Challenge (Rank 165). Pipeline combining ResNet-50 and BERT to extract entity values from images with high precision.",
+    tech: ["Python", "TensorFlow", "BERT", "OCR"],
+    github: "https://github.com/pyansu07/Amazon-ML-Challenge",
+    live: null,
+    icon: ScanEye,
+    type: "AI Pipeline"
+  },
+  {
+    title: "ProxyNova",
+    description: "High-performance proxy server in C. Handles concurrent client requests via threading and implements LRU caching to optimize network packet handling.",
+    tech: ["C", "Systems", "Networking", "Linux"],
+    github: "https://github.com/pyansu07/ProxyNova",
+    live: null,
+    icon: Terminal,
+    type: "Systems"
+  },
+  {
+    title: "Profit Pulse",
+    description: "Financial analytics app with ML-powered ROI prediction. Features real-time inventory optimization and visualizes business metrics.",
+    tech: ["React", "Flask", "Python", "Firebase"],
+    github: "https://github.com/pyansu07/Profit-Pulse",
+    live: null,
+    icon: BarChart3,
+    type: "FinTech"
+  },
+  {
+    title: "Nirvana (SIH)",
+    description: "Enhanced low-light lunar images for Smart India Hackathon. Used CLAHE & Gamma Correction to reveal crater details in PSR regions.",
+    tech: ["Python", "OpenCV", "Flask", "React"],
+    github: "https://github.com/pyansu07/Nirvana",
+    live: "https://youtu.be/ef7uSElfpqg?si=IQj01LfCzdmq0LpH",
+    icon: Youtube,
+    type: "ML / CV"
+  }
+];
 
-interface MainProject extends BaseProject {
-  image: string;
-  demo?: string;
-}
-
-interface FilteredProject extends BaseProject {
-  demo?: string;
-}
 
 const Projects = () => {
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<ProjectCategory | null>(null);
-
-  const projects: MainProject[] = [
-    {
-      title: 'TypeChamp',
-      description: 'A real-time multiplayer typing game where players compete in typing challenges, with a chat feature for interacting with opponents during matches.',
-      image: i1,
-      github: 'https://github.com/pyansu07/TypeChamp_v2',
-      demo: 'https://tc-d-frontend.onrender.com/',
-      tags: ['REACT', 'JAVASCRIPT', 'Web-Sockets', 'CSS']
-    },
-    {
-      title: 'Kora',
-      description: 'A beautifully designed SaaS landing page featuring a modern UI, built with Next.js, Tailwind CSS and ShadCN UI',
-      image: i2,
-      github: 'https://github.com/pyansu07/kora',
-      demo: 'https://koraai.vercel.app/',
-      tags: ['NEXT.JS', 'TAILWIND', 'SHADCN']
-    },
-    {
-      title: 'AttireAura',
-      description: 'A modern clothing store web application that offers a seamless shopping experience. It features advanced product filtering, integrated customer support via a chatbot.',
-      image: i3,
-      github: 'https://github.com/pyansu07/AttireAura',
-      tags: ['MERN', 'Stripe', 'RESTful APIs']
-    },
-    {
-      title: 'Nirvana',
-      description: 'An SIH project aimed at enhancing the images of the PSR on the Moon, by utilizing advanced image processing techniques',
-      image: i4,
-      github: 'https://github.com/pyansu07/Nirvana',
-      demo: 'https://youtu.be/ef7uSElfpqg?si=IQj01LfCzdmq0LpH',
-      tags: ['REACT', 'FLASK', 'PYTHON']
-    },
-    {
-      title: 'ProxyNova',
-      description: 'A high-performance proxy server developed in C. It efficiently handles client requests sequentially and caches responses to optimize network performance, enhancing speed and reducing latency for end-users.',
-      image: i5,
-      github: 'https://github.com/pyansu07/ProxyNova',
-      tags: ['C', 'Socket Programming', 'Computer Networking']
-    },
-    {
-      title: 'X-Bot',
-      description: 'This Twitter Bot automatically tweets on a schedule using Node.js, the Twitter API, and cron jobs.',
-      image: i6,
-      github: 'https://github.com/pyansu07/Twitter-Bot',
-      tags: ['Javascript','Node.js', 'TWITTER API']
-    },
-  ];
-
-  // Additional projects organized by category
-  const filteredProjects: Record<ProjectCategory, FilteredProject[]> = {
-    frontend: [
-      {
-        title: 'Portfolio 1.0',
-        description: 'Personal portfolio website',
-        github: 'https://github.com/pyansu07/Portfolio',
-        demo: 'https://pyansu07.github.io/Portfolio/',
-        tags: ['REACT']
-      },
-      {
-        title: 'Portfolio 2.0',
-        description: 'Personal portfolio website',
-        github: 'https://github.com/yourusername/portfolio',
-        tags: ['REACT', 'TAILWIND']
-      }
-    ],
-    backend: [
-      {
-        title: 'TCP Server',
-        description: 'This project demonstrates how to build a basic TCP server in C, covering concepts like three-way handshake.',
-        github: 'https://github.com/pyansu07/TCP_Server',
-        tags: ['C']
-      }
-    ],
-    fullstack: [
-      {
-        title: 'EmployEase',
-        description: 'Full-stack Employee Management System, showcasing core OOP principles like encapsulation, inheritance, abstraction, and polymorphism.',
-        github: 'https://github.com/yourusername/blog',
-        tags: ['Java', 'Spring Boot', 'React']
-      },
-      {
-        title: 'Profit-Pulse',
-        description: 'This is a full-stack application designed to calculate the profit of a seller based on sales and remaining stock.',
-        github: 'https://github.com/pyansu07/Profit-Pulse',
-        tags: ['REACT', 'FLASK', 'PYTHON']
-      },
-      {
-        title: 'TrackTube',
-        description: 'A Chrome extension that shows your last 5 watched YouTube videos directly from your browser.',
-        github: 'https://github.com/pyansu07/TrackTube',
-        tags: ['Javascript']
-      }
-    ],
-    ml: [
-      {
-        title: 'Amazon-ML-Challenge',
-        description: 'Designed a pipeline to extract product dimensions (width, height, depth) and weight using OCR.',
-        github: 'https://github.com/pyansu07/Amazon-ML-Challenge',
-        tags: ['PYTHON', 'OCR']
-      },
-      {
-        title: 'EstateInsight',
-        description: 'Predic price of a house based on features like location, area, etc.',
-        github: 'https://github.com/pyansu07/EstateInsight',
-        tags: ['PYTHON','TENSORFLOW']
-      },
-      {
-        title: 'ML_Classify',
-        description: 'Image classification.',
-        github: 'https://github.com/pyansu07/ML_Classify',
-        tags: ['PYTHON', 'TENSORFLOW']
-      }
-    ]
-  };
-
   return (
-    <section id="projects" className="py-16 bg-gray-900">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <motion.h2 
-          className="text-3xl md:text-4xl font-bold text-center mb-12 text-white"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          Projects
-        </motion.h2>
+    <section id="projects" className="py-24">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <div className="flex items-center gap-4 mb-12">
+          <h2 className="text-3xl font-bold text-slate-100"> <span className="text-cyan-400">03.</span> Featured Projects</h2>
+          <div className="h-px bg-slate-800 flex-grow"></div>
+        </div>
 
+        {/* Changed grid to 3 columns for desktop to fit 6 items nicely */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative bg-gray-800/90 rounded-lg shadow-xl overflow-hidden hover:shadow-purple-500/20 transition-all duration-300"
+          {projects.map((project, idx) => (
+            <motion.div 
+              key={idx}
+              whileHover={{ y: -5 }}
+              className="bg-slate-900/50 p-6 rounded border border-slate-800 hover:border-cyan-400/50 transition-all group flex flex-col relative overflow-hidden"
             >
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2 text-white">{project.title}</h3>
-                <p className="text-gray-400 mb-4">{project.description}</p>
-                
-                {/* Tech Stack Tags */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.tags.map((tag, tagIndex) => (
-                    <span
-                      key={tagIndex}
-                      className="px-2 py-0.5 text-xs font-medium rounded-full"
-                      style={{
-                        backgroundColor: getTagColor(tag),
-                        color: 'white'
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl -z-10 group-hover:bg-cyan-500/10 transition-colors"></div>
 
-                <div className="flex space-x-4">
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
-                  >
-                    <Github className="w-5 h-5 mr-2" />
-                    Code
-                  </a>
-                  {project.demo && (
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
-                    >
-                      <ExternalLink className="w-5 h-5 mr-2" />
-                      Demo
-                    </a>
-                  )}
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3 bg-slate-800/80 rounded-lg text-cyan-400 border border-slate-700">
+                    <project.icon size={24} />
                 </div>
+                <div className="flex gap-4 text-slate-400">
+                  <a href={project.github} target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors"><Github size={20} /></a>
+                  {project.live && <a href={project.live} target="_blank" rel="noopener noreferrer" className="hover:text-cyan-400 transition-colors"><ExternalLink size={20} /></a>}
+                </div>
+              </div>
+
+              <div className="mb-3">
+                 <span className="text-xs font-mono text-cyan-400 mb-1 block">{project.type}</span>
+                 <h3 className="text-lg font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
+                    {project.title}
+                 </h3>
+              </div>
+              
+              <p className="text-slate-400 mb-6 flex-grow text-sm leading-relaxed">
+                {project.description}
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-auto">
+                {project.tech.map((t, i) => (
+                  <span key={i} className="text-[10px] font-mono text-cyan-400/80 bg-cyan-950/30 px-2 py-1 rounded border border-cyan-900/50">
+                    {t}
+                  </span>
+                ))}
               </div>
             </motion.div>
           ))}
         </div>
-
-        <div className="mt-16 flex flex-col items-center gap-8">
-          <motion.button
-            className="px-8 py-3 text-lg text-white bg-gray-800/50 rounded-lg backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300 hover:shadow-lg"
-            onClick={() => setShowFilters(!showFilters)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Other Projects
-          </motion.button>
-
-          {showFilters && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-4 flex-wrap justify-center"
+        
+        {/* Optional "See More" button if you have even more on GitHub */}
+        <div className="mt-12 text-center">
+            <a 
+                href="https://github.com/pyansu07" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-cyan-400 hover:text-cyan-300 font-mono text-sm border-b border-cyan-400/30 hover:border-cyan-400 transition-all pb-1"
             >
-              {['Frontend', 'Backend', 'Full Stack', 'ML'].map((filter) => (
-                <motion.button
-                  key={filter}
-                  className={`px-6 py-2 text-gray-300 bg-gray-800/50 rounded-lg backdrop-blur-sm hover:bg-gray-700/50 transition-all duration-300 
-                    ${activeFilter === filter.toLowerCase().replace(' ', '') ? 'ring-2 ring-blue-500' : ''}`}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    const category = filter.toLowerCase().replace(' ', '') as ProjectCategory;
-                    setActiveFilter(activeFilter === category ? null : category);
-                  }}
-                >
-                  {filter}
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-
-          {/* Filtered Projects */}
-          <AnimatePresence mode="wait">
-            {activeFilter && (
-              <motion.div
-                key={activeFilter}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-8"
-              >
-                {filteredProjects[activeFilter].map((project, index) => (
-                  <motion.div
-                    key={project.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                    className="group relative bg-gray-800/90 rounded-lg shadow-xl overflow-hidden hover:shadow-purple-500/20 transition-all duration-300"
-                  >
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold mb-2 text-white">{project.title}</h3>
-                      <p className="text-gray-400 mb-4">{project.description}</p>
-                      
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {project.tags.map((tag, tagIndex) => (
-                          <span
-                            key={tagIndex}
-                            className="px-2 py-0.5 text-xs font-medium rounded-full"
-                            style={{
-                              backgroundColor: getTagColor(tag),
-                              color: 'white'
-                            }}
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-
-                      <div className="flex space-x-4">
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
-                        >
-                          <Github className="w-5 h-5 mr-2" />
-                          Code
-                        </a>
-                        {project.demo && (
-                    <a
-                      href={project.demo}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-gray-300 hover:text-blue-400 transition-colors"
-                    >
-                      <ExternalLink className="w-5 h-5 mr-2" />
-                      Demo
-                    </a>
-                  )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                View Full Project Archive <ExternalLink size={14} />
+            </a>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
-};
-
-// Helper function to get tag colors
-const getTagColor = (tag: string): string => {
-  const colors: { [key: string]: string } = {
-    // Languages & Core Technologies
-    REACT: '#61DAFB',  // React Blue
-    JAVASCRIPT: '#F7DF1E',  // JavaScript Yellow
-    PYTHON: '#3776AB',  // Python Blue
-    'C': '#A8B9CC',  // C Gray-Blue
-    JAVA: '#007396',  // Java Blue
-
-    // Frameworks & Libraries
-    'NEXT.JS': '#000000',  // Next.js Black
-    FLASK: '#000000',  // Flask Black
-    TAILWIND: '#06B6D4',  // Tailwind Cyan
-    SHADCN: '#000000',  // ShadCN Black
-    
-    // Databases & Backend
-    MONGODB: '#47A248',  // MongoDB Green
-    'Web-Sockets': '#010101',  // WebSocket Black
-    'Socket Programming': '#4B5563',  // Socket Gray
-    
-    // APIs & Services
-    'TWITTER API': '#1DA1F2',  // Twitter Blue
-    OCR: '#FF6B6B',  // OCR Red
-    TENSORFLOW: '#FF6F00',  // TensorFlow Orange
-    
-    // Tools & Others
-    CSS: '#1572B6',  // CSS Blue
-    MERN: '#00ED64',  // MERN Green
-    'Computer Networking': '#4B5563',  // Networking Gray
-    'RESTful APIs': '#FF4154',  // REST Red
-    Stripe: '#008CDD',  // Stripe Blue
-  };
-  
-  // Return the color if it exists, otherwise return a default gray
-  return colors[tag] || '#4B5563';
 };
 
 export default Projects;
