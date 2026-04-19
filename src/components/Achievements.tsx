@@ -9,12 +9,6 @@ const technical = [
     color: "text-yellow-400"
   },
   {
-    title: "Smart India Hackathon (Internal)",
-    desc: "Winner - Selected for the national round",
-    icon: Award,
-    color: "text-purple-400"
-  },
-  {
     title: "LeetCode & Codeforces",
     desc: "Top 10% (Rating 1745) | Global Rank 2,179 (CF)",
     icon: Star,
