@@ -2,22 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 80px; /* Helps CSS based scrolling stop at the right place */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 90px;
+  }
+
+  body {
+    background-color: #05070e;
+    color: #cbd5e1;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 }
 
-/* Custom scrollbar to match the theme */
+@layer utilities {
+  /* Animated brand gradient text */
+  .text-gradient {
+    background-image: linear-gradient(
+      120deg,
+      #5eead4 0%,
+      #22d3ee 35%,
+      #38bdf8 65%,
+      #818cf8 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Faint blueprint grid */
+  .bg-grid {
+    background-image: linear-gradient(
+        to right,
+        rgba(148, 163, 184, 0.05) 1px,
+        transparent 1px
+      ),
+      linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(
+      ellipse 80% 55% at 50% 0%,
+      #000 55%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse 80% 55% at 50% 0%,
+      #000 55%,
+      transparent 100%
+    );
+  }
+
+  /* Glassmorphism surface */
+  .glass {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-card {
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.1);
+  }
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 9px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a; 
+  background: #05070e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155; 
-  border-radius: 4px;
+  background: #1e293b;
+  border-radius: 9px;
+  border: 2px solid #05070e;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #22d3ee; 
+  background: #22d3ee;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.25);
+  color: #f1f5f9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
