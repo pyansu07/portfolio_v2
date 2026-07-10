@@ -3,14 +3,52 @@ import { Briefcase, GraduationCap, MapPin } from 'lucide-react';
 import SectionHeading from './SectionHeading';
 
 const experiences = [
-  {
+{
     role: 'Full Stack Intern',
     company: 'HR Logix',
     location: 'Remote — Australia',
     period: 'Apr 2026 — Present',
     current: true,
-    stack: ['Node.js', 'NestJS', 'Express', 'TypeORM', 'TypeScript', 'MongoDB', 'PostgreSQL', 'React', 'AWS S3', 'gRPC'],
+    stack: ['Node.js', 'NestJS', 'Express', 'TypeORM', 'TypeScript', 'MongoDB', 'PostgreSQL', 'React', 'AWS S3', 'gRPC', 'Cloudflare', 'Kubernetes'],
     points: [
+      <>
+        Built a full-stack{' '}
+        <span className="text-slate-200">CMS from scratch across 3 repos</span>{' '}
+        (Node.js, MongoDB, React) — <span className="text-cyan-400">17 REST APIs</span>{' '}
+        and <span className="text-cyan-400">22 per-page content collections</span>{' '}
+        via a Mongoose model factory, with an approval workflow backed by{' '}
+        <span className="text-slate-200">multi-document MongoDB transactions</span>.
+      </>,
+      <>
+        Designed the CMS approval pipeline — content edits create pending{' '}
+        <span className="font-mono text-cyan-400/90">ChangeRequest</span> documents
+        (proposed value + pre-change snapshot) instead of writing directly;
+        approving applies the change atomically and invalidates cache, with
+        automatic <span className="text-slate-200">supersede handling</span>{' '}
+        for stacked pending edits on the same key.
+      </>,
+      <>
+        Added a{' '}
+        <span className="text-slate-200">30s TTL in-memory cache</span>{' '}
+        auto-invalidated on every write; profiled the admin dashboard firing{' '}
+        <span className="text-cyan-400">~40 parallel requests</span> on load
+        (22 pages × 2 queries) and designed a server-side fan-out endpoint to
+        collapse it to 2 calls.
+      </>,
+      <>
+        Integrated <span className="text-cyan-400">gRPC</span> (FileService) to
+        delegate S3 presigning to an internal microservice — the CMS backend
+        holds <span className="text-slate-200">zero AWS credentials</span>;
+        browsers PUT directly to S3 via the returned presigned URL.
+      </>,
+      <>
+        Adopted a{' '}
+        <span className="text-slate-200">CDN URL storage strategy</span> so
+        every stored image resolves through Cloudflare's resize Lambda with
+        automatic <span className="text-cyan-400">AVIF/WebP/JPEG</span>{' '}
+        negotiation — browsers get the smallest format they support, zero
+        per-image work required.
+      </>,
       <>
         Built a two-sided{' '}
         <span className="text-slate-200">Carrier Onboarding backend</span> — a
@@ -27,8 +65,18 @@ const experiences = [
         and implemented{' '}
         <span className="text-slate-200">optimistic concurrency control</span>{' '}
         via guarded <span className="font-mono text-cyan-400/90">findOneAndUpdate</span>{' '}
-        operations to prevent race conditions on status transitions, backed by
-        an append-only audit trail for compliance.
+        operations on both contractor and operator writes to prevent race
+        conditions on status transitions, backed by an append-only{' '}
+        <span className="text-cyan-400">audit trail</span> for compliance.
+      </>,
+      <>
+        Built{' '}
+        <span className="text-slate-200">dual JWT authentication</span>{' '}
+        systems (contractor vs. internal operator) with{' '}
+        <span className="text-cyan-400">IDOR-safe data scoping</span>, and
+        integrated AWS S3 uploads via presigned PUT URLs plus{' '}
+        <span className="text-slate-200">base64 signature capture</span> for
+        compliance documents.
       </>,
       <>
         Shipped{' '}
@@ -40,19 +88,9 @@ const experiences = [
       </>,
       <>
         Built <span className="text-cyan-400">5 production React components</span>
-        , including a Google Places API autocomplete field and a live
-        Shipping Label preview panel.
-      </>,
-      <>
-        Built <span className="text-slate-200">dual JWT auth</span> (contractor
-        vs. internal operator) with IDOR-safe scoping, plus AWS S3 uploads via
-        presigned PUT URLs for compliance documents.
-      </>,
-      <>
-        Integrated a <span className="text-slate-200">gRPC microservice</span>{' '}
-        and a CMS approval workflow where edits create pending{' '}
-        <span className="font-mono text-cyan-400/90">ChangeRequest</span> docs,
-        applied atomically via MongoDB transactions with cache invalidation.
+        , including a unified Add/Edit Pickup Location modal with{' '}
+        <span className="text-slate-200">Google Places API</span> autocomplete
+        and a live Shipping Label preview panel.
       </>,
     ],
   },
