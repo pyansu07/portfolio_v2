@@ -109,7 +109,7 @@ const Hero = () => {
             Full-Stack &amp; Systems Engineer specializing in event-driven
             microservices and data-intensive pipelines. Currently building
             two-sided onboarding systems at{' '}
-            <span className="text-slate-100 font-semibold">HR Logix</span>
+            <span className="text-slate-100 font-semibold">Wobbi Logix</span>
             .
           </motion.p>
 
@@ -219,7 +219,7 @@ const Hero = () => {
                 {'  '}
                 <span className="text-sky-300">currentlyAt</span>
                 <span className="text-slate-500">:</span>{' '}
-                <span className="text-emerald-300">&apos;HR Logix&apos;</span>
+                <span className="text-emerald-300">&apos;Wobbi Logix&apos;</span>
                 <span className="text-slate-500">,</span>
                 {'\n'}
                 {'  '}
