@@ -1,7 +1,22 @@
-import { ReactNode, useState } from 'react';
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { ReactNode, useRef, useState } from 'react';
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useSpring,
+  Variants,
+} from 'framer-motion';
 import { Briefcase, ChevronDown, GraduationCap, MapPin } from 'lucide-react';
 import SectionHeading from './SectionHeading';
+import {
+  DUR,
+  EASE,
+  EASE_IN_OUT,
+  SPRING,
+  staggerContainer,
+  staggerItem,
+  viewportOnce,
+} from '../lib/motion';
 
 type Project = {
   title: string;
@@ -185,14 +200,16 @@ const experiences: Experience[] = [
   },
 ];
 
-const cardsContainer: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.1 } },
+const cardV: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: DUR.md, ease: EASE } },
+  hover: { y: -3, transition: SPRING },
 };
 
-const cardItem: Variants = {
-  hidden: { opacity: 0, y: 14 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+/** Revealed bullets cascade instead of appearing as one block of text. */
+const bulletV: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: DUR.sm, ease: EASE } },
 };
 
 const ProjectCard = ({ project }: { project: Project }) => {
@@ -200,8 +217,9 @@ const ProjectCard = ({ project }: { project: Project }) => {
 
   return (
     <motion.div
-      variants={cardItem}
-      className="rounded-xl border border-slate-800 bg-slate-900/40 p-5 transition-colors hover:border-cyan-400/30"
+      variants={cardV}
+      whileHover="hover"
+      className="rounded-xl border border-slate-800 bg-slate-900/40 p-5 transition-colors duration-300 hover:border-cyan-400/30"
     >
       <h5 className="font-bold text-slate-100">{project.title}</h5>
       <p className="mt-1 text-sm leading-relaxed text-slate-400">
@@ -212,12 +230,12 @@ const ProjectCard = ({ project }: { project: Project }) => {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="mt-3 inline-flex items-center gap-1.5 font-mono text-xs text-cyan-400 transition-colors hover:text-cyan-300"
+        className="group/btn mt-3 inline-flex items-center gap-1.5 font-mono text-xs text-cyan-400 transition-colors hover:text-cyan-300"
       >
         {open ? 'Hide technical details' : 'View technical details'}
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}
-          transition={{ duration: 0.25 }}
+          transition={SPRING}
           className="inline-flex"
         >
           <ChevronDown size={14} />
@@ -231,28 +249,42 @@ const ProjectCard = ({ project }: { project: Project }) => {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeInOut' }}
+            transition={{
+              height: { duration: DUR.md, ease: EASE_IN_OUT },
+              opacity: { duration: DUR.sm, ease: EASE_IN_OUT },
+            }}
             className="overflow-hidden"
           >
-            <ul className="mt-4 space-y-2.5 text-[15px] leading-relaxed text-slate-400">
+            <motion.ul
+              variants={staggerContainer(0.05, 0.08)}
+              initial="hidden"
+              animate="show"
+              className="mt-4 space-y-2.5 text-[15px] leading-relaxed text-slate-400"
+            >
               {project.points.map((point, i) => (
-                <li key={i} className="flex gap-3">
+                <motion.li key={i} variants={bulletV} className="flex gap-3">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400/60" />
                   <span>{point}</span>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
 
-            <div className="mt-4 flex flex-wrap gap-2">
+            <motion.div
+              variants={staggerContainer(0.025, 0.16)}
+              initial="hidden"
+              animate="show"
+              className="mt-4 flex flex-wrap gap-2"
+            >
               {project.stack.map((t) => (
-                <span
+                <motion.span
                   key={t}
+                  variants={bulletV}
                   className="rounded border border-slate-800 bg-slate-950/60 px-2 py-0.5 font-mono text-[11px] text-slate-400"
                 >
                   {t}
-                </span>
+                </motion.span>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -260,7 +292,41 @@ const ProjectCard = ({ project }: { project: Project }) => {
   );
 };
 
+/** Timeline entry: slides in, then cascades its own header lines. */
+const entryV: Variants = {
+  hidden: { opacity: 0, x: -20 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: DUR.md,
+      ease: EASE,
+      staggerChildren: 0.07,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const markerV: Variants = {
+  hidden: { scale: 0, opacity: 0 },
+  show: { scale: 1, opacity: 1, transition: SPRING },
+};
+
 const About = () => {
+  const timelineRef = useRef<HTMLDivElement>(null);
+
+  // The connector line draws itself as the timeline scrolls past, tying the
+  // entries together instead of leaving them as unrelated floating cards.
+  const { scrollYProgress } = useScroll({
+    target: timelineRef,
+    offset: ['start 80%', 'end 60%'],
+  });
+  const lineScale = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 30,
+    mass: 0.3,
+  });
+
   return (
     <section id="about" className="py-24 scroll-mt-20">
       <SectionHeading number="01" title="My Journey" />
@@ -272,19 +338,36 @@ const About = () => {
             <Briefcase size={18} /> Work Experience
           </h3>
 
-          <div className="relative border-l border-slate-800 ml-3 space-y-12">
+          <div ref={timelineRef} className="relative ml-3 space-y-12">
+            {/* Static track + the progress line that draws over it. */}
+            <div
+              aria-hidden
+              className="absolute left-0 top-0 h-full w-px bg-slate-800"
+            />
+            <motion.div
+              aria-hidden
+              style={{ scaleY: lineScale }}
+              className="absolute left-0 top-0 h-full w-px origin-top bg-gradient-to-b from-cyan-400/70 via-cyan-400/40 to-cyan-400/10"
+            />
+
             {experiences.map((exp) => (
               <motion.div
                 key={exp.company}
-                initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5 }}
+                variants={entryV}
+                initial="hidden"
+                whileInView="show"
+                viewport={viewportOnce}
                 className="relative pl-8"
               >
-                <span className="absolute -left-[9px] top-1.5 h-4 w-4 rounded-full border-4 border-ink bg-cyan-400 shadow-[0_0_0_4px_rgba(34,211,238,0.12)]" />
+                <motion.span
+                  variants={markerV}
+                  className="absolute -left-[9px] top-1.5 h-4 w-4 rounded-full border-4 border-ink bg-cyan-400 shadow-[0_0_0_4px_rgba(34,211,238,0.12)]"
+                />
 
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <motion.div
+                  variants={staggerItem}
+                  className="flex flex-wrap items-center gap-x-3 gap-y-1"
+                >
                   <h4 className="text-xl font-bold text-slate-100">
                     {exp.role}
                   </h4>
@@ -293,25 +376,33 @@ const About = () => {
                       Current
                     </span>
                   )}
-                </div>
+                </motion.div>
 
-                <p className="mt-0.5 font-mono text-cyan-400">
+                <motion.p
+                  variants={staggerItem}
+                  className="mt-0.5 font-mono text-cyan-400"
+                >
                   {exp.company}
                   <span className="mx-2 text-slate-600">/</span>
                   <span className="inline-flex items-center gap-1 text-slate-500">
                     <MapPin size={12} /> {exp.location}
                   </span>
-                </p>
-                <p className="mb-4 font-mono text-xs text-slate-500">
+                </motion.p>
+                <motion.p
+                  variants={staggerItem}
+                  className="mb-4 font-mono text-xs text-slate-500"
+                >
                   {exp.period}
-                </p>
+                </motion.p>
 
                 {exp.projects ? (
+                  // Its own trigger — these sit well below the entry header and
+                  // shouldn't animate while still off-screen.
                   <motion.div
-                    variants={cardsContainer}
+                    variants={staggerContainer(0.1)}
                     initial="hidden"
                     whileInView="show"
-                    viewport={{ once: true, margin: '-60px' }}
+                    viewport={viewportOnce}
                     className="space-y-4"
                   >
                     {exp.projects.map((project) => (
@@ -319,27 +410,32 @@ const About = () => {
                     ))}
                   </motion.div>
                 ) : (
-                  <>
+                  <motion.div variants={staggerContainer(0.05)}>
                     <ul className="space-y-2.5 text-[15px] leading-relaxed text-slate-400">
                       {exp.points!.map((point, i) => (
-                        <li key={i} className="flex gap-3">
+                        <motion.li
+                          key={i}
+                          variants={bulletV}
+                          className="flex gap-3"
+                        >
                           <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-400/60" />
                           <span>{point}</span>
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
 
                     <div className="mt-4 flex flex-wrap gap-2">
                       {exp.stack!.map((t) => (
-                        <span
+                        <motion.span
                           key={t}
+                          variants={bulletV}
                           className="rounded border border-slate-800 bg-slate-900/60 px-2 py-0.5 font-mono text-[11px] text-slate-400"
                         >
                           {t}
-                        </span>
+                        </motion.span>
                       ))}
                     </div>
-                  </>
+                  </motion.div>
                 )}
               </motion.div>
             ))}
@@ -353,44 +449,80 @@ const About = () => {
           </h3>
 
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors hover:border-cyan-400/30"
+            variants={{
+              hidden: { opacity: 0, y: 20, scale: 0.98 },
+              show: {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                transition: {
+                  duration: DUR.md,
+                  ease: EASE,
+                  staggerChildren: 0.06,
+                  delayChildren: 0.12,
+                },
+              },
+            }}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors duration-300 hover:border-cyan-400/30"
           >
-            <div className="mb-3 flex items-start justify-between gap-3">
+            <motion.div
+              variants={bulletV}
+              className="mb-3 flex items-start justify-between gap-3"
+            >
               <h4 className="text-lg font-bold text-slate-100">
                 Indian Institute of Information Technology, Nagpur
               </h4>
               <span className="shrink-0 rounded bg-cyan-400/10 px-2 py-1 font-mono text-[11px] text-cyan-400">
                 2022 — 26
               </span>
-            </div>
-            <p className="text-slate-400">B.Tech</p>
-            <p className="mt-1 font-mono text-sm text-slate-500">
+            </motion.div>
+            <motion.p variants={bulletV} className="text-slate-400">
+              B.Tech
+            </motion.p>
+            <motion.p
+              variants={bulletV}
+              className="mt-1 font-mono text-sm text-slate-500"
+            >
               Nagpur, Maharashtra
-            </p>
+            </motion.p>
 
             <div className="mt-5 space-y-3 border-t border-slate-800 pt-5">
-              <div className="flex items-center justify-between text-sm">
+              <motion.div
+                variants={bulletV}
+                className="flex items-center justify-between text-sm"
+              >
                 <span className="text-slate-400">JEE Mains &amp; Advanced 2022</span>
                 <span className="font-mono font-bold text-cyan-400">
                   Qualified
                 </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
+              </motion.div>
+              <motion.div
+                variants={bulletV}
+                className="flex items-center justify-between text-sm"
+              >
                 <span className="text-slate-400">Class XII</span>
                 <span className="font-mono font-bold text-cyan-400">96%</span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
+              </motion.div>
+              <motion.div
+                variants={bulletV}
+                className="flex items-center justify-between text-sm"
+              >
                 <span className="text-slate-400">Class X</span>
                 <span className="font-mono font-bold text-cyan-400">94%</span>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
 
-          <div className="mt-5 rounded-xl border border-slate-800/70 bg-gradient-to-br from-slate-900/60 to-slate-900/20 p-6">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={viewportOnce}
+            transition={{ duration: DUR.md, ease: EASE, delay: 0.1 }}
+            className="mt-5 rounded-xl border border-slate-800/70 bg-gradient-to-br from-slate-900/60 to-slate-900/20 p-6"
+          >
             <p className="font-mono text-xs uppercase tracking-wider text-slate-500">
               Core Concepts
             </p>
@@ -398,7 +530,7 @@ const About = () => {
               OOP · DSA · Operating Systems · DBMS · System Design ·
               Microservices
             </p>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

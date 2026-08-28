@@ -1,8 +1,10 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { Trophy, Medal, ExternalLink } from 'lucide-react';
 import SectionHeading from './SectionHeading';
 import Counter from './Counter';
 import { links } from '../data/links';
+import { DUR, EASE, SPRING, viewportOnce } from '../lib/motion';
+import { useCoarsePointer } from '../lib/hooks';
 
 const awards = [
   {
@@ -50,7 +52,57 @@ const cp = [
   },
 ];
 
+const awardV: Variants = {
+  hidden: { opacity: 0, x: -24 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: DUR.md,
+      ease: EASE,
+      staggerChildren: 0.07,
+      delayChildren: 0.1,
+    },
+  },
+  hover: { y: -3, transition: SPRING },
+};
+
+const medalV: Variants = {
+  hidden: { opacity: 0, scale: 0.6, rotate: -12 },
+  show: { opacity: 1, scale: 1, rotate: 0, transition: SPRING },
+  hover: { scale: 1.08, rotate: 0, transition: SPRING },
+};
+
+const lineV: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: { opacity: 1, y: 0, transition: { duration: DUR.sm, ease: EASE } },
+};
+
+/** Stat card: container settles, then number, bar and rows follow. */
+const statV: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: DUR.md,
+      ease: EASE,
+      staggerChildren: 0.08,
+      delayChildren: 0.12,
+    },
+  },
+  hover: { y: -4, transition: SPRING },
+};
+
+const barV: Variants = {
+  hidden: { scaleX: 0 },
+  show: { scaleX: 1, transition: { duration: DUR.xl, ease: EASE } },
+};
+
 const Achievements = () => {
+  // Tap-latched hover states look broken on touch; skip the gesture there.
+  const coarse = useCoarsePointer();
+
   return (
     <section id="achievements" className="py-24 scroll-mt-20">
       <SectionHeading number="04" title="Achievements" />
@@ -61,29 +113,37 @@ const Achievements = () => {
           {awards.map((a) => (
             <motion.div
               key={a.title}
-              initial={{ opacity: 0, x: -16 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.45 }}
-              className="flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors hover:border-cyan-400/30"
+              variants={awardV}
+              initial="hidden"
+              whileInView="show"
+              whileHover={coarse ? undefined : 'hover'}
+              viewport={viewportOnce}
+              className="flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors duration-300 hover:border-cyan-400/30"
             >
-              <div
+              <motion.div
+                variants={medalV}
                 className={`shrink-0 rounded-full bg-slate-800 p-3 ring-1 ${a.ring} ${a.color}`}
               >
                 <a.icon size={22} />
-              </div>
+              </motion.div>
               <div>
-                <div className="flex flex-wrap items-center gap-2">
+                <motion.div
+                  variants={lineV}
+                  className="flex flex-wrap items-center gap-2"
+                >
                   <h4 className="font-display text-lg font-bold text-slate-100">
                     {a.title}
                   </h4>
                   <span className="rounded bg-cyan-400/10 px-2 py-0.5 font-mono text-[11px] text-cyan-400">
                     {a.tag}
                   </span>
-                </div>
-                <p className="mt-1.5 text-sm leading-relaxed text-slate-400">
+                </motion.div>
+                <motion.p
+                  variants={lineV}
+                  className="mt-1.5 text-sm leading-relaxed text-slate-400"
+                >
                   {a.desc}
-                </p>
+                </motion.p>
               </div>
             </motion.div>
           ))}
@@ -97,47 +157,53 @@ const Achievements = () => {
               href={c.href}
               target="_blank"
               rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.45 }}
-              whileHover={{ y: -4 }}
-              className="group flex flex-col rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors hover:border-cyan-400/40"
+              variants={statV}
+              initial="hidden"
+              whileInView="show"
+              whileHover={coarse ? undefined : 'hover'}
+              viewport={viewportOnce}
+              className="group flex flex-col rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors duration-300 hover:border-cyan-400/40"
             >
-              <div className="mb-4 flex items-center justify-between">
+              <motion.div
+                variants={lineV}
+                className="mb-4 flex items-center justify-between"
+              >
                 <span className="font-mono text-sm text-slate-300">
                   {c.platform}
                 </span>
                 <ExternalLink
                   size={15}
-                  className="text-slate-600 transition-colors group-hover:text-cyan-400"
+                  className="text-slate-600 transition-all duration-300 group-hover:text-cyan-400 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 />
-              </div>
+              </motion.div>
 
-              <div className="flex items-baseline gap-2">
+              <motion.div variants={lineV} className="flex items-baseline gap-2">
+                {/* Counter has its own in-view trigger, so it still fires once. */}
                 <Counter
                   to={c.rating}
                   className={`font-display text-4xl font-bold ${c.accent}`}
                 />
                 <span className="font-mono text-xs text-slate-500">rating</span>
-              </div>
+              </motion.div>
 
               <div className="my-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className={`h-full rounded-full bg-gradient-to-r ${c.barColor}`}
+                <motion.div
+                  variants={barV}
                   style={{ width: `${c.pct}%` }}
+                  className={`h-full origin-left rounded-full bg-gradient-to-r ${c.barColor}`}
                 />
               </div>
 
               <dl className="mt-auto space-y-1.5">
                 {c.lines.map(([label, value]) => (
-                  <div
+                  <motion.div
                     key={label}
+                    variants={lineV}
                     className="flex items-center justify-between text-xs"
                   >
                     <dt className="text-slate-500">{label}</dt>
                     <dd className="font-mono text-slate-300">{value}</dd>
-                  </div>
+                  </motion.div>
                 ))}
               </dl>
             </motion.a>

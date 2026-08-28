@@ -1,5 +1,10 @@
-import { useRef } from 'react';
-import { motion } from 'framer-motion';
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  Variants,
+} from 'framer-motion';
 import {
   Github,
   ExternalLink,
@@ -13,6 +18,8 @@ import {
 } from 'lucide-react';
 import SectionHeading from './SectionHeading';
 import { links } from '../data/links';
+import { DUR, EASE, SPRING, viewportOnce } from '../lib/motion';
+import { useCoarsePointer } from '../lib/hooks';
 
 const projects = [
   {
@@ -85,73 +92,126 @@ const projects = [
 
 type Project = (typeof projects)[number];
 
+/* Parent drives `hover` down to the children below — no per-child gesture
+   handlers, so the whole card responds as one object. */
+const cardV: Variants = {
+  hidden: { opacity: 0, y: 26 },
+  show: { opacity: 1, y: 0 },
+  hover: { y: -6, transition: SPRING },
+};
+
+/* Each child declares its resting state explicitly so un-hover has a defined
+   target to return to rather than falling back to the base style. */
+const iconV: Variants = {
+  show: { scale: 1, rotate: 0, transition: SPRING },
+  hover: { scale: 1.07, rotate: -4, transition: SPRING },
+};
+
+const titleV: Variants = {
+  show: { x: 0, transition: SPRING },
+  hover: { x: 3, transition: SPRING },
+};
+
+const sheenV: Variants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 0, transition: { duration: DUR.sm, ease: EASE } },
+  hover: { opacity: 1, transition: { duration: DUR.sm, ease: EASE } },
+};
+
 const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
-  const ref = useRef<HTMLDivElement>(null);
+  const coarse = useCoarsePointer();
+
+  // Pointer position as motion values — the spotlight follows without a single
+  // React render per mousemove.
+  const mx = useMotionValue(-400);
+  const my = useMotionValue(-400);
+  const sx = useSpring(mx, { stiffness: 260, damping: 30, mass: 0.35 });
+  const sy = useSpring(my, { stiffness: 260, damping: 30, mass: 0.35 });
+
+  const spotlight = useTransform(
+    [sx, sy],
+    ([x, y]: number[]) =>
+      `radial-gradient(320px circle at ${x}px ${y}px, rgba(34,211,238,0.10), transparent 62%)`
+  );
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    el.style.setProperty('--mx', `${e.clientX - rect.left}px`);
-    el.style.setProperty('--my', `${e.clientY - rect.top}px`);
+    const rect = e.currentTarget.getBoundingClientRect();
+    mx.set(e.clientX - rect.left);
+    my.set(e.clientY - rect.top);
   };
 
   return (
     <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.45, delay: (idx % 3) * 0.08 }}
-      whileHover={{ y: -6 }}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 p-6 transition-colors hover:border-cyan-400/40"
+      variants={cardV}
+      initial="hidden"
+      whileInView="show"
+      viewport={viewportOnce}
+      whileHover={coarse ? undefined : 'hover'}
+      transition={{ duration: DUR.md, ease: EASE, delay: (idx % 3) * 0.08 }}
+      onMouseMove={coarse ? undefined : handleMouseMove}
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 p-6 transition-colors duration-300 hover:border-cyan-400/40"
     >
-      {/* Mouse spotlight */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background:
-            'radial-gradient(340px circle at var(--mx) var(--my), rgba(34,211,238,0.09), transparent 65%)',
-        }}
+      {/* Cursor spotlight — desktop only. */}
+      {!coarse && (
+        <motion.div
+          aria-hidden
+          style={{ background: spotlight }}
+          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        />
+      )}
+
+      {/* Top-edge sheen picks out the hovered card in the grid. */}
+      <motion.div
+        aria-hidden
+        variants={sheenV}
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent opacity-0"
       />
 
       <div className="relative mb-6 flex items-start justify-between">
-        <span className="rounded-lg border border-slate-700 bg-slate-800/70 p-3 text-cyan-400">
+        <motion.span
+          variants={iconV}
+          className="rounded-lg border border-slate-700 bg-slate-800/70 p-3 text-cyan-400 transition-colors duration-300 group-hover:border-cyan-400/40"
+        >
           <project.icon size={22} />
-        </span>
+        </motion.span>
         <div className="flex gap-3 text-slate-400">
-          <a
+          <motion.a
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${project.title} on GitHub`}
+            whileHover={{ y: -2, scale: 1.12 }}
+            whileTap={{ scale: 0.92 }}
+            transition={SPRING}
             className="transition-colors hover:text-cyan-400"
           >
             <Github size={20} />
-          </a>
+          </motion.a>
           {project.live && (
-            <a
+            <motion.a
               href={project.live}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${project.title} live`}
+              whileHover={{ y: -2, scale: 1.12 }}
+              whileTap={{ scale: 0.92 }}
+              transition={SPRING}
               className="transition-colors hover:text-cyan-400"
             >
               <ExternalLink size={20} />
-            </a>
+            </motion.a>
           )}
         </div>
       </div>
 
-      <div className="relative mb-3">
+      <motion.div variants={titleV} className="relative mb-3">
         <span className="font-mono text-[11px] uppercase tracking-wider text-cyan-400/80">
           {project.type}
         </span>
-        <h3 className="font-display text-lg font-bold text-slate-100 transition-colors group-hover:text-cyan-400">
+        <h3 className="font-display text-lg font-bold text-slate-100 transition-colors duration-300 group-hover:text-cyan-400">
           {project.title}
         </h3>
-      </div>
+      </motion.div>
 
       <p className="relative mb-6 flex-grow text-sm leading-relaxed text-slate-400">
         {project.description}
@@ -161,7 +221,7 @@ const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
         {project.tech.map((t) => (
           <span
             key={t}
-            className="rounded border border-cyan-900/50 bg-cyan-950/30 px-2 py-1 font-mono text-[10px] text-cyan-400/80"
+            className="rounded border border-cyan-900/50 bg-cyan-950/30 px-2 py-1 font-mono text-[10px] text-cyan-400/80 transition-colors duration-300 group-hover:border-cyan-700/60"
           >
             {t}
           </span>
@@ -182,20 +242,26 @@ const Projects = () => {
         ))}
       </div>
 
-      <div className="mt-12 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={viewportOnce}
+        transition={{ duration: DUR.md, ease: EASE }}
+        className="mt-12 text-center"
+      >
         <a
           href={links.github}
           target="_blank"
           rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2 border-b border-cyan-400/30 pb-1 font-mono text-sm text-cyan-400 transition-all hover:border-cyan-400"
+          className="group inline-flex items-center gap-2 border-b border-cyan-400/30 pb-1 font-mono text-sm text-cyan-400 transition-colors hover:border-cyan-400"
         >
           View full project archive
           <ArrowUpRight
             size={15}
-            className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           />
         </a>
-      </div>
+      </motion.div>
     </section>
   );
 };

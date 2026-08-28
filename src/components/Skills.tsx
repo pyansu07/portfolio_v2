@@ -1,6 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import { Code2, Layout, Server, Database, Wrench } from 'lucide-react';
 import SectionHeading from './SectionHeading';
+import { DUR, EASE, SPRING, viewportOnce } from '../lib/motion';
+import { useCoarsePointer } from '../lib/hooks';
 
 const categories = [
   {
@@ -30,7 +32,40 @@ const categories = [
   },
 ];
 
+/**
+ * Each card is its own variant root: it triggers on its own scroll position
+ * (so the lower rows don't animate off-screen) and then cascades its chips.
+ */
+const cardV: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: DUR.md,
+      ease: EASE,
+      staggerChildren: 0.022,
+      delayChildren: 0.14,
+    },
+  },
+  hover: { y: -4, transition: SPRING },
+};
+
+const iconV: Variants = {
+  hidden: { opacity: 0, scale: 0.7 },
+  show: { opacity: 1, scale: 1, rotate: 0, transition: SPRING },
+  hover: { scale: 1.1, rotate: -5, transition: SPRING },
+};
+
+const chipV: Variants = {
+  hidden: { opacity: 0, y: 6 },
+  show: { opacity: 1, y: 0, transition: { duration: DUR.sm, ease: EASE } },
+};
+
 const Skills = () => {
+  // Without this a tap latches the hover variant until the next tap elsewhere.
+  const coarse = useCoarsePointer();
+
   return (
     <section id="skills" className="py-24 scroll-mt-20">
       <SectionHeading number="02" title="Technical Skills" />
@@ -39,31 +74,39 @@ const Skills = () => {
         {categories.map((cat, idx) => (
           <motion.div
             key={cat.title}
-            initial={{ opacity: 0, y: 18 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.45, delay: idx * 0.06 }}
-            className={`group rounded-xl border border-slate-800 bg-slate-900/40 p-6 transition-colors hover:border-cyan-400/30 ${
+            variants={cardV}
+            initial="hidden"
+            whileInView="show"
+            whileHover={coarse ? undefined : 'hover'}
+            viewport={viewportOnce}
+            className={`group rounded-xl border border-slate-800 bg-slate-900/40 p-6 transition-colors duration-300 hover:border-cyan-400/30 ${
               idx === 4 ? 'lg:col-span-2' : ''
             }`}
           >
             <div className="mb-4 flex items-center gap-3">
-              <span className="rounded-lg border border-slate-700 bg-slate-800/70 p-2 text-cyan-400 transition-colors group-hover:border-cyan-400/40">
+              <motion.span
+                variants={iconV}
+                className="rounded-lg border border-slate-700 bg-slate-800/70 p-2 text-cyan-400 transition-colors duration-300 group-hover:border-cyan-400/40"
+              >
                 <cat.icon size={18} />
-              </span>
-              <h3 className="font-display font-semibold text-slate-100">
+              </motion.span>
+              <motion.h3
+                variants={chipV}
+                className="font-display font-semibold text-slate-100"
+              >
                 {cat.title}
-              </h3>
+              </motion.h3>
             </div>
 
             <div className="flex flex-wrap gap-2">
               {cat.items.map((skill) => (
-                <span
+                <motion.span
                   key={skill}
-                  className="rounded-md border border-slate-800 bg-slate-800/40 px-2.5 py-1 font-mono text-[12px] text-slate-400 transition-colors hover:border-cyan-400/40 hover:bg-cyan-400/5 hover:text-cyan-300"
+                  variants={chipV}
+                  className="rounded-md border border-slate-800 bg-slate-800/40 px-2.5 py-1 font-mono text-[12px] text-slate-400 transition-colors duration-200 hover:border-cyan-400/40 hover:bg-cyan-400/5 hover:text-cyan-300"
                 >
                   {skill}
-                </span>
+                </motion.span>
               ))}
             </div>
           </motion.div>

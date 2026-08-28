@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { animate, useInView } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import { animate, useInView, useReducedMotion } from 'framer-motion';
 
 interface Props {
   to: number;
@@ -9,7 +9,12 @@ interface Props {
   className?: string;
 }
 
-/** Animates from 0 to `to` the first time it scrolls into view. */
+/**
+ * Animates from 0 to `to` the first time it scrolls into view, then stops.
+ *
+ * Writes to `textContent` directly rather than through state — a counter at
+ * 60fps for 1.6s would otherwise trigger ~96 React renders per instance.
+ */
 const Counter = ({
   to,
   prefix = '',
@@ -19,23 +24,33 @@ const Counter = ({
 }: Props) => {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
-  const [value, setValue] = useState(0);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
-    if (!inView) return;
+    const el = ref.current;
+    if (!el || !inView) return;
+
+    // Reduced motion: land on the value without counting up to it.
+    if (reduce) {
+      el.textContent = `${prefix}${to}${suffix}`;
+      return;
+    }
+
     const controls = animate(0, to, {
       duration,
       ease: [0.16, 1, 0.3, 1],
-      onUpdate: (v) => setValue(v),
+      onUpdate: (v) => {
+        el.textContent = `${prefix}${Math.round(v)}${suffix}`;
+      },
     });
-    return () => controls.stop();
-  }, [inView, to, duration]);
 
+    return () => controls.stop();
+  }, [inView, to, duration, prefix, suffix, reduce]);
+
+  // Rendered once with the zero state; the effect owns the text from then on.
   return (
     <span ref={ref} className={className}>
-      {prefix}
-      {Math.round(value)}
-      {suffix}
+      {`${prefix}0${suffix}`}
     </span>
   );
 };
