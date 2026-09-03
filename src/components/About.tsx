@@ -145,7 +145,7 @@ const hrLogixProjects: Project[] = [
 
 const experiences: Experience[] = [
   {
-    role: 'Full Stack Intern',
+    role: 'Full Stack Developer',
     company: 'Wobbi Logix',
     location: 'Remote — Australia',
     period: 'May 2026 — Present',
