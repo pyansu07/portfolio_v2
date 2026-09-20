@@ -11,7 +11,7 @@
       content="Pyansu Nahak — Full-Stack & Systems Engineer building scalable backends, event-driven microservices, and high-performance data engines. IIIT Nagpur '26."
     />
     <meta name="author" content="Pyansu Nahak" />
-    <meta name="theme-color" content="#05070e" />
+    <meta name="theme-color" content="#0b1220" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -25,9 +25,25 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Apply the stored theme before first paint so there is no flash. -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (!t)
+            t = window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+          document.documentElement.dataset.theme = t;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

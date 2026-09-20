@@ -1,6 +1,6 @@
 import { motion, Variants } from 'framer-motion';
 import { Trophy, Medal, ExternalLink } from 'lucide-react';
-import SectionHeading from './SectionHeading';
+import SectionHeading, { SubHeading } from './SectionHeading';
 import Counter from './Counter';
 import { links } from '../data/links';
 import { DUR, EASE, SPRING, viewportOnce } from '../lib/motion';
@@ -9,16 +9,12 @@ import { useCoarsePointer } from '../lib/hooks';
 const awards = [
   {
     icon: Trophy,
-    color: 'text-yellow-400',
-    ring: 'ring-yellow-400/20',
     title: 'Amazon ML Challenge 2024',
-    desc: 'Ranked 165 out of 18,720+ teams for a multi-modal ResNet-50 + BERT pipeline.',
-    tag: 'Rank #165',
+    desc: 'AIR 165 out of 18,720+ teams for a multi-modal ResNet-50 + BERT pipeline.',
+    tag: 'AIR 165',
   },
   {
     icon: Medal,
-    color: 'text-purple-400',
-    ring: 'ring-purple-400/20',
     title: 'Imagen AI Hackathon',
     desc: 'Finalist in the AI hackathon organized by IIT Delhi.',
     tag: 'Finalist',
@@ -29,21 +25,17 @@ const cp = [
   {
     platform: 'LeetCode',
     href: links.leetcode,
-    rating: 1745,
-    accent: 'text-amber-400',
-    barColor: 'from-amber-400 to-yellow-500',
-    pct: 90,
+    rating: 1810,
+    pct: 93,
     lines: [
-      ['Percentile', 'Top 10% globally'],
-      ['Weekly Contest 421', '#2,836 / 27,902'],
+      ['Percentile', 'Top 7% globally'],
+      ['Biweekly Contest 191', '#970 / 39,596'],
     ],
   },
   {
     platform: 'Codeforces',
     href: links.codeforces,
     rating: 1390,
-    accent: 'text-sky-400',
-    barColor: 'from-sky-400 to-cyan-500',
     pct: 62,
     lines: [
       ['Rank', 'Specialist track'],
@@ -52,11 +44,11 @@ const cp = [
   },
 ];
 
-const awardV: Variants = {
-  hidden: { opacity: 0, x: -24 },
+const cardV: Variants = {
+  hidden: { opacity: 0, y: 18 },
   show: {
     opacity: 1,
-    x: 0,
+    y: 0,
     transition: {
       duration: DUR.md,
       ease: EASE,
@@ -64,7 +56,7 @@ const awardV: Variants = {
       delayChildren: 0.1,
     },
   },
-  hover: { y: -3, transition: SPRING },
+  hover: { y: -4, transition: SPRING },
 };
 
 const medalV: Variants = {
@@ -78,22 +70,6 @@ const lineV: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: DUR.sm, ease: EASE } },
 };
 
-/** Stat card: container settles, then number, bar and rows follow. */
-const statV: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: DUR.md,
-      ease: EASE,
-      staggerChildren: 0.08,
-      delayChildren: 0.12,
-    },
-  },
-  hover: { y: -4, transition: SPRING },
-};
-
 const barV: Variants = {
   hidden: { scaleX: 0 },
   show: { scaleX: 1, transition: { duration: DUR.xl, ease: EASE } },
@@ -104,76 +80,74 @@ const Achievements = () => {
   const coarse = useCoarsePointer();
 
   return (
-    <section id="achievements" className="py-24 scroll-mt-20">
-      <SectionHeading number="04" title="Achievements" />
+    <section id="achievements" className="scroll-mt-24 py-16">
+      <SectionHeading
+        title="Achievements"
+        intro="Competition results and competitive-programming standings."
+      />
 
-      <div className="grid gap-5 lg:grid-cols-2">
-        {/* Awards */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
-          {awards.map((a) => (
-            <motion.div
-              key={a.title}
-              variants={awardV}
-              initial="hidden"
-              whileInView="show"
-              whileHover={coarse ? undefined : 'hover'}
-              viewport={viewportOnce}
-              className="flex items-start gap-4 rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors duration-300 hover:border-cyan-400/30"
-            >
-              <motion.div
-                variants={medalV}
-                className={`shrink-0 rounded-full bg-slate-800 p-3 ring-1 ${a.ring} ${a.color}`}
-              >
-                <a.icon size={22} />
-              </motion.div>
-              <div>
-                <motion.div
-                  variants={lineV}
-                  className="flex flex-wrap items-center gap-2"
-                >
-                  <h4 className="font-display text-lg font-bold text-slate-100">
-                    {a.title}
-                  </h4>
-                  <span className="rounded bg-cyan-400/10 px-2 py-0.5 font-mono text-[11px] text-cyan-400">
-                    {a.tag}
-                  </span>
-                </motion.div>
-                <motion.p
-                  variants={lineV}
-                  className="mt-1.5 text-sm leading-relaxed text-slate-400"
-                >
-                  {a.desc}
-                </motion.p>
-              </div>
+      <div className="space-y-4 xl:max-w-3xl">
+        {awards.map((a) => (
+          <motion.div
+            key={a.title}
+            variants={cardV}
+            initial="hidden"
+            whileInView="show"
+            whileHover={coarse ? undefined : 'hover'}
+            viewport={viewportOnce}
+            className="flex items-start gap-4 rounded-xl bg-surface p-6 ring-1 ring-line/70 transition-colors duration-300 hover:ring-accent/40"
+          >
+            <motion.div variants={medalV} className="shrink-0 text-accent">
+              <a.icon size={22} />
             </motion.div>
-          ))}
-        </div>
+            <div>
+              <motion.div
+                variants={lineV}
+                className="flex flex-wrap items-center gap-x-2.5 gap-y-1"
+              >
+                <h4 className="text-[15px] font-bold text-body">{a.title}</h4>
+                <span className="font-mono text-[11px] font-semibold text-accent">
+                  {a.tag}
+                </span>
+              </motion.div>
+              <motion.p
+                variants={lineV}
+                className="mt-1.5 text-[14px] leading-relaxed text-muted"
+              >
+                {a.desc}
+              </motion.p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
 
-        {/* Competitive programming */}
-        <div className="grid gap-5 sm:grid-cols-2">
+      <div className="mt-12 xl:max-w-3xl">
+        <SubHeading title="Competitive Programming" />
+
+        <div className="grid gap-4 sm:grid-cols-2">
           {cp.map((c) => (
             <motion.a
               key={c.platform}
               href={c.href}
               target="_blank"
               rel="noopener noreferrer"
-              variants={statV}
+              variants={cardV}
               initial="hidden"
               whileInView="show"
               whileHover={coarse ? undefined : 'hover'}
               viewport={viewportOnce}
-              className="group flex flex-col rounded-xl border border-slate-800 bg-slate-900/50 p-6 transition-colors duration-300 hover:border-cyan-400/40"
+              className="group flex flex-col rounded-xl bg-surface p-6 ring-1 ring-line/70 transition-colors duration-300 hover:ring-accent/40"
             >
               <motion.div
                 variants={lineV}
-                className="mb-4 flex items-center justify-between"
+                className="mb-3 flex items-center justify-between"
               >
-                <span className="font-mono text-sm text-slate-300">
+                <span className="text-[14px] font-semibold text-body">
                   {c.platform}
                 </span>
                 <ExternalLink
-                  size={15}
-                  className="text-slate-600 transition-all duration-300 group-hover:text-cyan-400 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  size={14}
+                  className="text-muted transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
                 />
               </motion.div>
 
@@ -181,16 +155,16 @@ const Achievements = () => {
                 {/* Counter has its own in-view trigger, so it still fires once. */}
                 <Counter
                   to={c.rating}
-                  className={`font-display text-4xl font-bold ${c.accent}`}
+                  className="text-[2rem] font-extrabold tracking-tight text-accent"
                 />
-                <span className="font-mono text-xs text-slate-500">rating</span>
+                <span className="text-[12px] text-muted">rating</span>
               </motion.div>
 
-              <div className="my-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="my-4 h-1 w-full overflow-hidden rounded-full bg-line">
                 <motion.div
                   variants={barV}
                   style={{ width: `${c.pct}%` }}
-                  className={`h-full origin-left rounded-full bg-gradient-to-r ${c.barColor}`}
+                  className="h-full origin-left rounded-full bg-accent"
                 />
               </div>
 
@@ -199,10 +173,10 @@ const Achievements = () => {
                   <motion.div
                     key={label}
                     variants={lineV}
-                    className="flex items-center justify-between text-xs"
+                    className="flex items-center justify-between text-[12.5px]"
                   >
-                    <dt className="text-slate-500">{label}</dt>
-                    <dd className="font-mono text-slate-300">{value}</dd>
+                    <dt className="text-muted/80">{label}</dt>
+                    <dd className="font-mono text-body/90">{value}</dd>
                   </motion.div>
                 ))}
               </dl>

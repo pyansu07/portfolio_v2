@@ -1,36 +1,74 @@
+import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import RevealText from './RevealText';
-import { lineReveal, viewportOnce } from '../lib/motion';
+import Squiggle from './Squiggle';
+import { staggerContainer, staggerItem, viewportOnce } from '../lib/motion';
 
 interface Props {
-  number: string;
   title: string;
+  /** Short lead paragraph shown between the title and the squiggle. */
+  intro?: ReactNode;
 }
 
-const SectionHeading = ({ number, title }: Props) => {
-  return (
-    <div className="flex items-center gap-4 mb-12">
-      <RevealText
-        as="h2"
-        text={title}
-        className="font-display text-2xl sm:text-3xl font-bold text-slate-100 whitespace-nowrap tracking-tight"
-        lead={
-          <span className="text-cyan-400 font-mono text-lg sm:text-xl mr-2 align-middle">
-            {number}.
-          </span>
-        }
-      />
+/** Page-level section header: title, optional intro, accent wave. */
+const SectionHeading = ({ title, intro }: Props) => (
+  <motion.div
+    variants={staggerContainer(0.07)}
+    initial="hidden"
+    whileInView="show"
+    viewport={viewportOnce}
+    className="mb-10"
+  >
+    <RevealText
+      as="h2"
+      trigger="inherit"
+      text={title}
+      className="text-3xl font-extrabold tracking-tight text-body sm:text-[2.1rem]"
+    />
 
-      {/* Accent rule wipes in just behind the words. */}
-      <motion.div
-        variants={lineReveal}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="h-px flex-grow origin-left bg-gradient-to-r from-slate-700 via-slate-800 to-transparent"
-      />
-    </div>
-  );
-};
+    {intro && (
+      <motion.p
+        variants={staggerItem}
+        className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted sm:text-base"
+      >
+        {intro}
+      </motion.p>
+    )}
+
+    <Squiggle className="mt-5" />
+  </motion.div>
+);
+
+/** Smaller heading for blocks inside a section (Skills, Work History, …). */
+export const SubHeading = ({
+  title,
+  intro,
+}: {
+  title: string;
+  intro?: ReactNode;
+}) => (
+  <motion.div
+    variants={staggerContainer(0.06)}
+    initial="hidden"
+    whileInView="show"
+    viewport={viewportOnce}
+    className="mb-6"
+  >
+    <motion.h3
+      variants={staggerItem}
+      className="text-xl font-bold tracking-tight text-body"
+    >
+      {title}
+    </motion.h3>
+    {intro && (
+      <motion.p
+        variants={staggerItem}
+        className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted"
+      >
+        {intro}
+      </motion.p>
+    )}
+  </motion.div>
+);
 
 export default SectionHeading;

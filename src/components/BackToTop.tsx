@@ -31,7 +31,7 @@ const BackToTop = () => {
           whileTap={{ scale: 0.92 }}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           aria-label="Back to top"
-          className="group fixed bottom-6 right-6 z-50 rounded-full border border-slate-700 bg-slate-900/80 p-3 text-cyan-400 backdrop-blur-md transition-colors hover:border-cyan-400/50 hover:bg-slate-800 hover:shadow-[0_0_22px_-6px_rgba(34,211,238,0.7)]"
+          className="group fixed bottom-6 right-6 z-50 rounded-full bg-surface p-3 text-accent ring-1 ring-line backdrop-blur-md transition-colors hover:ring-accent/50"
         >
           <motion.span
             className="block"

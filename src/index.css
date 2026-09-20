@@ -2,73 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * Palette lives in CSS variables so the theme toggle swaps one attribute on
+ * <html> rather than every component needing a `dark:` twin.
+ */
 @layer base {
-  :root {
+  :root,
+  :root[data-theme='dark'] {
     color-scheme: dark;
+
+    --bg: 11 18 32; /* #0b1220 page */
+    --surface: 18 28 48; /* #121c30 cards */
+    --border: 31 43 68;
+    --text: 248 250 252;
+    --muted: 148 163 184;
+    --accent: 245 165 36; /* #f5a524 */
+  }
+
+  :root[data-theme='light'] {
+    color-scheme: light;
+
+    --bg: 251 250 247;
+    --surface: 255 255 255;
+    --border: 226 223 214;
+    --text: 15 23 42;
+    --muted: 100 116 139;
+    --accent: 217 133 11;
   }
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 90px;
+    scroll-padding-top: 100px;
   }
 
   body {
-    background-color: #05070e;
-    color: #cbd5e1;
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: rgb(var(--bg));
+    color: rgb(var(--muted));
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-}
 
-@layer utilities {
-  /* Animated brand gradient text */
-  .text-gradient {
-    background-image: linear-gradient(
-      120deg,
-      #5eead4 0%,
-      #22d3ee 35%,
-      #38bdf8 65%,
-      #818cf8 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
+  /* Underlined inline links, matching the reference's understated rule. */
+  .link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    text-decoration-color: rgb(var(--muted) / 0.45);
+    transition: color 0.2s, text-decoration-color 0.2s;
+  }
+  .link:hover {
+    color: rgb(var(--accent));
+    text-decoration-color: rgb(var(--accent));
   }
 
-  /* Faint blueprint grid */
-  .bg-grid {
-    background-image: linear-gradient(
-        to right,
-        rgba(148, 163, 184, 0.05) 1px,
-        transparent 1px
-      ),
-      linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
-    background-size: 44px 44px;
-    -webkit-mask-image: radial-gradient(
-      ellipse 80% 55% at 50% 0%,
-      #000 55%,
-      transparent 100%
-    );
-    mask-image: radial-gradient(
-      ellipse 80% 55% at 50% 0%,
-      #000 55%,
-      transparent 100%
-    );
+  .link-accent {
+    color: rgb(var(--text));
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    text-decoration-color: rgb(var(--accent));
+    transition: color 0.2s;
   }
-
-  /* Glassmorphism surface */
-  .glass {
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-
-  .glass-card {
-    background: rgba(15, 23, 42, 0.4);
-    border: 1px solid rgba(148, 163, 184, 0.1);
+  .link-accent:hover {
+    color: rgb(var(--accent));
   }
 }
 
@@ -77,20 +75,20 @@
   width: 9px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070e;
+  background: rgb(var(--bg));
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: rgb(var(--border));
   border-radius: 9px;
-  border: 2px solid #05070e;
+  border: 2px solid rgb(var(--bg));
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #22d3ee;
+  background: rgb(var(--accent));
 }
 
 ::selection {
-  background: rgba(34, 211, 238, 0.25);
-  color: #f1f5f9;
+  background: rgb(var(--accent) / 0.28);
+  color: rgb(var(--text));
 }
 
 @media (prefers-reduced-motion: reduce) {

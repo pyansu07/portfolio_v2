@@ -1,10 +1,4 @@
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  Variants,
-} from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import {
   Github,
   ExternalLink,
@@ -12,8 +6,8 @@ import {
   ScanEye,
   Keyboard,
   Terminal,
-  BarChart3,
-  Youtube,
+  Bot,
+  Wallet,
   ArrowUpRight,
 } from 'lucide-react';
 import SectionHeading from './SectionHeading';
@@ -31,18 +25,26 @@ const projects = [
     github: 'https://github.com/pyansu07/Job-X',
     live: null,
     icon: Network,
-    featured: true,
+  },
+    {
+    title: 'Enroll Assistant',
+    type: 'Agentic AI Backend',
+    description:
+      'Multi-skill agentic backend with LLM intent routing, RAG retrieval, and human-in-the-loop confirmation that pauses and resumes mid-node across server restarts. Raised enrollment-intent accuracy from 47.62% to 100% by diagnosing a systematic router misclassification via a 54-case eval suite.',
+    tech: ['Python', 'FastAPI', 'LangGraph', 'ChromaDB', 'Groq'],
+    github: 'https://github.com/pyansu07/course-enrollment-agent',
+    live: 'https://course-enrollment-agent.vercel.app/',
+    icon: Bot,
   },
   {
     title: 'Code Cortex',
     type: 'Multi-Modal ML Pipeline',
     description:
-      'Ranked 165 / 18,720+ teams in the Amazon ML Challenge. A multi-modal pipeline fusing ResNet-50 (visual) and BERT (textual) with a custom Tesseract + Regex OCR layer to extract product dimensions from images.',
+      'AIR 165 / 18,720+ teams in the Amazon ML Challenge. A multi-modal pipeline fusing ResNet-50 (visual) and BERT (textual) with a custom Tesseract + Regex OCR layer to extract product dimensions from images.',
     tech: ['Python', 'TensorFlow', 'BERT', 'OpenCV', 'OCR'],
     github: 'https://github.com/pyansu07/Amazon-ML-Challenge',
     live: null,
     icon: ScanEye,
-    featured: true,
   },
   {
     title: 'TypeChamp',
@@ -53,7 +55,6 @@ const projects = [
     github: 'https://github.com/pyansu07/TypeChamp_v2',
     live: 'https://tc-d-frontend.onrender.com/',
     icon: Keyboard,
-    featured: true,
   },
   {
     title: 'ProxyNova',
@@ -64,81 +65,34 @@ const projects = [
     github: 'https://github.com/pyansu07/ProxyNova',
     live: null,
     icon: Terminal,
-    featured: false,
   },
   {
-    title: 'Profit Pulse',
-    type: 'FinTech Analytics',
+    title: 'FinSight',
+    type: 'Personal Finance Visualizer',
     description:
-      'Financial analytics app with ML-powered ROI prediction, real-time inventory optimization, and interactive business-metric dashboards.',
-    tech: ['React', 'Flask', 'Python', 'Firebase'],
-    github: 'https://github.com/pyansu07/Profit-Pulse',
-    live: null,
-    icon: BarChart3,
-    featured: false,
-  },
-  {
-    title: 'Nirvana',
-    type: 'Computer Vision',
-    description:
-      'Low-light lunar image enhancement for Smart India Hackathon. Applied CLAHE & Gamma Correction to reveal crater detail in permanently shadowed regions.',
-    tech: ['Python', 'OpenCV', 'Flask', 'React'],
-    github: 'https://github.com/pyansu07/Nirvana',
-    live: 'https://youtu.be/ef7uSElfpqg?si=IQj01LfCzdmq0LpH',
-    icon: Youtube,
-    featured: false,
+      'Full-stack finance tracker with a real-time dashboard, monthly-expense and category charts, per-category budgets with overspending alerts, a budget health score, and AI-powered spending insights. Dark/light mode, glass-morphism UI.',
+    tech: ['Next.js 14', 'TypeScript', 'MongoDB', 'Tailwind CSS', 'Recharts'],
+    github: 'https://github.com/pyansu07/FinSight',
+    live: 'https://personal-finance-visualizer-alpha-livid.vercel.app/',
+    icon: Wallet,
   },
 ];
 
 type Project = (typeof projects)[number];
 
-/* Parent drives `hover` down to the children below — no per-child gesture
-   handlers, so the whole card responds as one object. */
 const cardV: Variants = {
-  hidden: { opacity: 0, y: 26 },
+  hidden: { opacity: 0, y: 22 },
   show: { opacity: 1, y: 0 },
-  hover: { y: -6, transition: SPRING },
+  hover: { y: -4, transition: SPRING },
 };
 
-/* Each child declares its resting state explicitly so un-hover has a defined
-   target to return to rather than falling back to the base style. */
 const iconV: Variants = {
   show: { scale: 1, rotate: 0, transition: SPRING },
-  hover: { scale: 1.07, rotate: -4, transition: SPRING },
-};
-
-const titleV: Variants = {
-  show: { x: 0, transition: SPRING },
-  hover: { x: 3, transition: SPRING },
-};
-
-const sheenV: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 0, transition: { duration: DUR.sm, ease: EASE } },
-  hover: { opacity: 1, transition: { duration: DUR.sm, ease: EASE } },
+  hover: { scale: 1.08, rotate: -4, transition: SPRING },
 };
 
 const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
   const coarse = useCoarsePointer();
-
-  // Pointer position as motion values — the spotlight follows without a single
-  // React render per mousemove.
-  const mx = useMotionValue(-400);
-  const my = useMotionValue(-400);
-  const sx = useSpring(mx, { stiffness: 260, damping: 30, mass: 0.35 });
-  const sy = useSpring(my, { stiffness: 260, damping: 30, mass: 0.35 });
-
-  const spotlight = useTransform(
-    [sx, sy],
-    ([x, y]: number[]) =>
-      `radial-gradient(320px circle at ${x}px ${y}px, rgba(34,211,238,0.10), transparent 62%)`
-  );
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mx.set(e.clientX - rect.left);
-    my.set(e.clientY - rect.top);
-  };
 
   return (
     <motion.div
@@ -147,34 +101,15 @@ const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
       whileInView="show"
       viewport={viewportOnce}
       whileHover={coarse ? undefined : 'hover'}
-      transition={{ duration: DUR.md, ease: EASE, delay: (idx % 3) * 0.08 }}
-      onMouseMove={coarse ? undefined : handleMouseMove}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-900/40 p-6 transition-colors duration-300 hover:border-cyan-400/40"
+      transition={{ duration: DUR.md, ease: EASE, delay: (idx % 3) * 0.07 }}
+      className="flex flex-col rounded-xl bg-surface p-6 ring-1 ring-line/70 transition-colors duration-300 hover:ring-accent/40"
     >
-      {/* Cursor spotlight — desktop only. */}
-      {!coarse && (
-        <motion.div
-          aria-hidden
-          style={{ background: spotlight }}
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        />
-      )}
-
-      {/* Top-edge sheen picks out the hovered card in the grid. */}
-      <motion.div
-        aria-hidden
-        variants={sheenV}
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent opacity-0"
-      />
-
-      <div className="relative mb-6 flex items-start justify-between">
-        <motion.span
-          variants={iconV}
-          className="rounded-lg border border-slate-700 bg-slate-800/70 p-3 text-cyan-400 transition-colors duration-300 group-hover:border-cyan-400/40"
-        >
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <motion.span variants={iconV} className="text-accent">
           <project.icon size={22} />
         </motion.span>
-        <div className="flex gap-3 text-slate-400">
+
+        <div className="flex gap-3 text-muted">
           <motion.a
             href={project.github}
             target="_blank"
@@ -183,9 +118,9 @@ const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
             whileHover={{ y: -2, scale: 1.12 }}
             whileTap={{ scale: 0.92 }}
             transition={SPRING}
-            className="transition-colors hover:text-cyan-400"
+            className="transition-colors hover:text-accent"
           >
-            <Github size={20} />
+            <Github size={18} />
           </motion.a>
           {project.live && (
             <motion.a
@@ -196,32 +131,28 @@ const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
               whileHover={{ y: -2, scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
               transition={SPRING}
-              className="transition-colors hover:text-cyan-400"
+              className="transition-colors hover:text-accent"
             >
-              <ExternalLink size={20} />
+              <ExternalLink size={18} />
             </motion.a>
           )}
         </div>
       </div>
 
-      <motion.div variants={titleV} className="relative mb-3">
-        <span className="font-mono text-[11px] uppercase tracking-wider text-cyan-400/80">
-          {project.type}
-        </span>
-        <h3 className="font-display text-lg font-bold text-slate-100 transition-colors duration-300 group-hover:text-cyan-400">
-          {project.title}
-        </h3>
-      </motion.div>
+      <p className="text-[11.5px] font-semibold uppercase tracking-[0.12em] text-accent/85">
+        {project.type}
+      </p>
+      <h3 className="mt-1 text-[17px] font-bold text-body">{project.title}</h3>
 
-      <p className="relative mb-6 flex-grow text-sm leading-relaxed text-slate-400">
+      <p className="mt-2.5 flex-grow text-[14px] leading-relaxed text-muted">
         {project.description}
       </p>
 
-      <div className="relative mt-auto flex flex-wrap gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         {project.tech.map((t) => (
           <span
             key={t}
-            className="rounded border border-cyan-900/50 bg-cyan-950/30 px-2 py-1 font-mono text-[10px] text-cyan-400/80 transition-colors duration-300 group-hover:border-cyan-700/60"
+            className="rounded-md border border-line px-2 py-0.5 font-mono text-[11px] text-muted"
           >
             {t}
           </span>
@@ -231,39 +162,40 @@ const ProjectCard = ({ project, idx }: { project: Project; idx: number }) => {
   );
 };
 
-const Projects = () => {
-  return (
-    <section id="projects" className="py-24 scroll-mt-20">
-      <SectionHeading number="03" title="Featured Projects" />
+const Projects = () => (
+  <section id="projects" className="scroll-mt-24 py-16">
+    <SectionHeading
+      title="Projects"
+      intro="A selection of things I've designed and built — from event-driven backends and agentic AI to ML pipelines and low-level systems work."
+    />
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project, idx) => (
-          <ProjectCard key={project.title} project={project} idx={idx} />
-        ))}
-      </div>
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {projects.map((project, idx) => (
+        <ProjectCard key={project.title} project={project} idx={idx} />
+      ))}
+    </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={viewportOnce}
-        transition={{ duration: DUR.md, ease: EASE }}
-        className="mt-12 text-center"
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={viewportOnce}
+      transition={{ duration: DUR.md, ease: EASE }}
+      className="mt-8"
+    >
+      <a
+        href={links.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group inline-flex items-center gap-1.5 text-[15px] link-accent"
       >
-        <a
-          href={links.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group inline-flex items-center gap-2 border-b border-cyan-400/30 pb-1 font-mono text-sm text-cyan-400 transition-colors hover:border-cyan-400"
-        >
-          View full project archive
-          <ArrowUpRight
-            size={15}
-            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
-        </a>
-      </motion.div>
-    </section>
-  );
-};
+        View full project archive
+        <ArrowUpRight
+          size={15}
+          className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        />
+      </a>
+    </motion.div>
+  </section>
+);
 
 export default Projects;

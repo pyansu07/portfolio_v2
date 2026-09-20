@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence, motion, useScroll, useSpring } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
-import {
-  DUR,
-  EASE,
-  SPRING_SNAPPY,
-  SPRING_SOFT,
-  staggerContainer,
-  staggerItem,
-} from '../lib/motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X, Github, Linkedin, Contrast } from 'lucide-react';
+import { links } from '../data/links';
+import { useTheme } from '../lib/theme';
+import { DUR, EASE, SPRING_SOFT, staggerContainer, staggerItem } from '../lib/motion';
 
 const navLinks = [
   { name: 'Journey', id: 'about' },
@@ -19,22 +14,9 @@ const navLinks = [
 ];
 
 const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [active, setActive] = useState('');
-
-  const { scrollYProgress } = useScroll();
-  const progress = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    mass: 0.3,
-  });
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const { theme, toggle } = useTheme();
 
   // Highlight the section currently in view.
   useEffect(() => {
@@ -57,7 +39,7 @@ const Header = () => {
     const element = document.getElementById(id);
     if (element) {
       const offsetPosition =
-        element.getBoundingClientRect().top + window.pageYOffset - 80;
+        element.getBoundingClientRect().top + window.pageYOffset - 90;
       window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
       setMenuOpen(false);
     }
@@ -65,91 +47,118 @@ const Header = () => {
 
   return (
     <motion.header
-      initial={{ y: -24, opacity: 0 }}
+      initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: DUR.lg, ease: EASE }}
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? 'glass py-3.5 border-b border-slate-800/60 shadow-lg shadow-black/20'
-          : 'bg-transparent py-5'
-      }`}
+      className="fixed top-0 z-50 w-full bg-ink/85 backdrop-blur-md"
     >
       <motion.nav
-        variants={staggerContainer(0.06, 0.15)}
+        variants={staggerContainer(0.05, 0.15)}
         initial="hidden"
         animate="show"
-        className="max-w-6xl mx-auto px-5 sm:px-6 lg:px-8 flex justify-between items-center"
+        className="mx-auto flex max-w-[1600px] items-center justify-between px-6 py-5 md:px-10"
       >
+        {/* Wordmark: two accent slashes + initials */}
         <motion.button
           variants={staggerItem}
           whileHover={{ scale: 1.04 }}
           whileTap={{ scale: 0.96 }}
           transition={SPRING_SOFT}
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="font-display font-bold text-2xl tracking-tight text-slate-100 hover:text-cyan-400 transition-colors"
+          aria-label="Back to top"
+          className="flex items-baseline gap-1.5 text-2xl font-extrabold tracking-tight text-body"
         >
-          <span className="text-gradient">PN</span>
-          <span className="text-cyan-400">.</span>
+          <span className="text-accent" aria-hidden>
+            //
+          </span>
+          PN
         </motion.button>
 
-        {/* Desktop menu */}
-        <ul className="hidden md:flex items-center gap-1 text-sm font-mono">
-          {navLinks.map((link, i) => (
-            <motion.li key={link.id} variants={staggerItem}>
-              <button
-                onClick={() => scrollToSection(link.id)}
-                className={`relative px-3.5 py-2 rounded-md transition-colors ${
-                  active === link.id
-                    ? 'text-cyan-400'
-                    : 'text-slate-400 hover:text-slate-100'
-                }`}
-              >
-                <span className="text-cyan-500/80 mr-1">0{i + 1}.</span>
-                {link.name}
-                {active === link.id && (
-                  <motion.span
-                    layoutId="nav-active"
-                    className="absolute inset-0 -z-10 rounded-md bg-cyan-400/10 ring-1 ring-cyan-400/20"
-                    transition={SPRING_SNAPPY}
-                  />
-                )}
-              </button>
-            </motion.li>
-          ))}
-        </ul>
+        <div className="flex items-center gap-7">
+          {/* Desktop nav */}
+          <ul className="hidden items-center gap-7 md:flex">
+            {navLinks.map((link) => (
+              <motion.li key={link.id} variants={staggerItem}>
+                <button
+                  onClick={() => scrollToSection(link.id)}
+                  className={`text-[13px] font-semibold uppercase tracking-[0.12em] transition-colors ${
+                    active === link.id
+                      ? 'text-accent'
+                      : 'text-muted hover:text-body'
+                  }`}
+                >
+                  {link.name}
+                </button>
+              </motion.li>
+            ))}
+          </ul>
 
-        {/* Mobile toggle */}
-        <motion.button
-          variants={staggerItem}
-          whileTap={{ scale: 0.88 }}
-          transition={SPRING_SOFT}
-          className="md:hidden text-cyan-400 p-1"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
-        >
-          {/* Cross-fade + quarter turn between the two glyphs. */}
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span
-              key={menuOpen ? 'close' : 'open'}
-              initial={{ opacity: 0, rotate: -90, scale: 0.7 }}
-              animate={{ opacity: 1, rotate: 0, scale: 1 }}
-              exit={{ opacity: 0, rotate: 90, scale: 0.7 }}
-              transition={{ duration: DUR.xs, ease: EASE }}
-              className="block"
+          {/* Icon cluster */}
+          <motion.div
+            variants={staggerItem}
+            className="flex items-center gap-4 text-muted"
+          >
+            <motion.a
+              href={links.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="GitHub"
+              whileHover={{ y: -2, scale: 1.1 }}
+              whileTap={{ scale: 0.92 }}
+              transition={SPRING_SOFT}
+              className="transition-colors hover:text-body"
             >
-              {menuOpen ? <X /> : <Menu />}
-            </motion.span>
-          </AnimatePresence>
-        </motion.button>
+              <Github size={19} />
+            </motion.a>
+            <motion.a
+              href={links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+              whileHover={{ y: -2, scale: 1.1 }}
+              whileTap={{ scale: 0.92 }}
+              transition={SPRING_SOFT}
+              className="transition-colors hover:text-body"
+            >
+              <Linkedin size={19} />
+            </motion.a>
+            <motion.button
+              onClick={toggle}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.9, rotate: 180 }}
+              transition={SPRING_SOFT}
+              className="transition-colors hover:text-body"
+            >
+              <Contrast size={19} />
+            </motion.button>
+
+            {/* Mobile toggle */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              transition={SPRING_SOFT}
+              className="text-accent md:hidden"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={menuOpen ? 'close' : 'open'}
+                  initial={{ opacity: 0, rotate: -90, scale: 0.7 }}
+                  animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                  exit={{ opacity: 0, rotate: 90, scale: 0.7 }}
+                  transition={{ duration: DUR.xs, ease: EASE }}
+                  className="block"
+                >
+                  {menuOpen ? <X size={20} /> : <Menu size={20} />}
+                </motion.span>
+              </AnimatePresence>
+            </motion.button>
+          </motion.div>
+        </div>
       </motion.nav>
 
-      {/* Scroll progress bar */}
-      <motion.div
-        style={{ scaleX: progress }}
-        className="absolute bottom-0 left-0 h-px w-full origin-left bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-400"
-      />
-
-      {/* Mobile dropdown — container opens, then the items cascade in. */}
+      {/* Mobile dropdown */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -170,20 +179,23 @@ const Header = () => {
             initial="hidden"
             animate="show"
             exit="exit"
-            className="md:hidden absolute top-full left-0 w-full glass border-b border-slate-800 p-6 flex flex-col gap-3 shadow-2xl"
+            className="flex w-full flex-col gap-4 border-t border-line bg-ink px-6 pb-7 pt-5 md:hidden"
           >
-            {navLinks.map((link, i) => (
+            {navLinks.map((link) => (
               <motion.button
                 key={link.id}
                 variants={{
                   hidden: { opacity: 0, x: -12 },
-                  show: { opacity: 1, x: 0, transition: { duration: DUR.sm, ease: EASE } },
+                  show: {
+                    opacity: 1,
+                    x: 0,
+                    transition: { duration: DUR.sm, ease: EASE },
+                  },
                 }}
                 whileTap={{ scale: 0.97, x: 2 }}
                 onClick={() => scrollToSection(link.id)}
-                className="text-left text-slate-300 hover:text-cyan-400 font-mono py-1.5 transition-colors"
+                className="text-left text-sm font-semibold uppercase tracking-[0.12em] text-muted transition-colors hover:text-accent"
               >
-                <span className="text-cyan-400 mr-2">0{i + 1}.</span>
                 {link.name}
               </motion.button>
             ))}
